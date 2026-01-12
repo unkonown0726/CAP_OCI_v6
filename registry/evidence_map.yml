@@ -1,0 +1,221 @@
+# evidence_map.yml - Final Registry (CAP+OCI v6)
+# Generated: 2026-01-12
+
+# =============================================================================
+# Core Claims Evidence
+# =============================================================================
+
+E001:
+  claim_ref: C001 (CLAIM_A)
+  sources:
+    - type: manuscript
+      file: 1_MANUSCRIPT.txt
+      section: "4.1 Summary Claims"
+      strength: strong
+      note: "Both environments satisfy CLAIM_A"
+    - type: protocol_spec
+      file: 2_PROTOCOL_APPENDIX.txt
+      section: "G, H"
+      strength: strong
+      note: "Formal definition of crossing and CLAIM_A"
+    - type: results_table
+      file: 0_CAP_OCI_v6_Results.txt
+      strength: strong
+      note: "EnvA crossing (down), EnvB crossing (up)"
+    - type: implementation
+      file: src/cap_oci_v036.py
+      strength: strong
+      note: "seed_onset_pass, crossing calculation verified"
+
+E002:
+  claim_ref: C002 (CLAIM_B)
+  sources:
+    - type: manuscript
+      file: 1_MANUSCRIPT.txt
+      section: "4.1 Summary Claims"
+      strength: strong
+      note: "Both environments satisfy CLAIM_B"
+    - type: protocol_spec
+      file: 2_PROTOCOL_APPENDIX.txt
+      section: "E, H"
+      strength: strong
+      note: "Formal definition of weak robustness"
+    - type: results_table
+      file: 0_CAP_OCI_v6_Results.txt
+      strength: strong
+      note: "OR_LCB values exceed R_PASS at multiple g"
+    - type: pass_report
+      file: CAP_PASS_REPORT.md
+      strength: strong
+      note: "claim_ready = True"
+
+E003:
+  claim_ref: C003 (CLAIM_B+)
+  sources:
+    - type: manuscript
+      file: 1_MANUSCRIPT.txt
+      section: "4.1 Summary Claims"
+      strength: strong
+    - type: results_table
+      file: 0_CAP_OCI_v6_Results.txt
+      strength: strong
+      note: "AND_LCB values exceed R_STRONG at multiple g"
+    - type: pass_report
+      file: CAP_PASS_REPORT.md
+      strength: strong
+      note: "claim_b_strong = True"
+
+E004:
+  claim_ref: C004 (CLAIM_C)
+  sources:
+    - type: manuscript
+      file: 1_MANUSCRIPT.txt
+      section: "4.1 Summary Claims"
+      strength: strong
+    - type: protocol_spec
+      file: 2_PROTOCOL_APPENDIX.txt
+      section: "F, H"
+      strength: strong
+      note: "Formal definition of selective collapse"
+    - type: pass_report
+      file: CAP_PASS_REPORT.md
+      strength: strong
+      note: "selective_all = True at multiple g"
+
+# =============================================================================
+# Robustness Evidence
+# =============================================================================
+
+E005:
+  claim_ref: C005 (threshold_invariance)
+  sources:
+    - type: manuscript
+      file: 1_MANUSCRIPT.txt
+      section: "4.2 Threshold Sensitivity"
+      strength: strong
+      note: "32-combination sweep, all claim_ready = True"
+    - type: results_table
+      file: 0_CAP_OCI_v6_Results.txt
+      section: "4. Threshold Sensitivity Analysis"
+      strength: strong
+      note: "All 32 combinations listed with True"
+
+E006:
+  claim_ref: C006 (reproducibility)
+  sources:
+    - type: manuscript
+      file: 1_MANUSCRIPT.txt
+      section: "4.3 Reproducibility"
+      strength: strong
+      note: "Three independent full evaluations"
+    - type: pass_report
+      file: CAP_PASS_REPORT.md
+      strength: strong
+
+# =============================================================================
+# Generalization Evidence (Addenda)
+# =============================================================================
+
+E020:
+  claim_ref: C020 (seed_replication)
+  sources:
+    - type: addendum
+      file: Addendum_A_summary.md
+      strength: strong
+      note: "Set C and D both claim_ready = True"
+    - type: artifact
+      file: seeds_set_c.json, seeds_set_d.json
+      strength: strong
+      note: "SHA256 hashed for reproducibility"
+
+E021:
+  claim_ref: C021 (stochastic_noise)
+  sources:
+    - type: addendum
+      file: Addendum_B_summary_full_eval.md
+      strength: strong
+      note: "EnvE preserves crossing and claim_B"
+    - type: parameters
+      note: "ACTION_SLIP=0.1, OBS_NOISE=0.05, REWARD_NOISE=0.02"
+
+E022:
+  claim_ref: C022 (partial_observability)
+  sources:
+    - type: addendum
+      file: Addendum_C_summary_full_eval.md
+      strength: strong
+      note: "EnvB_PO (velocity hidden) preserves claims"
+
+E023:
+  claim_ref: C023 (hmm_nonstationarity)
+  sources:
+    - type: addendum
+      file: Addendum_D_summary_full_eval.md
+      strength: strong
+      note: "EnvA_HMM (hidden mode) preserves claims"
+
+E024:
+  claim_ref: C024 (high_dimensional)
+  sources:
+    - type: addendum
+      file: Addendum_F_summary_full_eval.md
+      strength: strong
+      note: "EnvC_highd (D=32) preserves claims"
+    - type: formula_verification
+      note: "onset_rate = n_onset / n_adequate confirmed"
+
+# =============================================================================
+# Definition/Assumption Evidence
+# =============================================================================
+
+E030:
+  definition_refs: [D003-D008]
+  sources:
+    - type: manuscript
+      file: 1_MANUSCRIPT.txt
+      section: "3.2 Metrics"
+      strength: strong
+    - type: implementation
+      file: src/cap_oci_v036.py
+      strength: strong
+      note: "CAPMetrics dataclass verified"
+
+E031:
+  definition_refs: [D015, D016]
+  sources:
+    - type: implementation
+      file: src/cap_oci_v036.py
+      lines: "283-327"
+      strength: strong
+      note: "Wilson and Cantelli LCB formulas verified"
+
+E032:
+  definition_refs: [D027-D032]
+  sources:
+    - type: specification
+      file: 8_CM_Operational_Definition.txt
+      section: "3. Minimal Axioms"
+      strength: strong
+      note: "Axiom 1-6 formally defined"
+
+# =============================================================================
+# Evidence Strength Summary
+# =============================================================================
+
+summary:
+  strong_evidence:
+    - "Core claims (A, B, B+, C) supported by manuscript, protocol, results, implementation"
+    - "Threshold invariance supported by 32-combination sweep"
+    - "Reproducibility supported by 3 independent runs"
+    - "Generalization supported by 5 addendum studies"
+  medium_evidence:
+    - "Theoretical foundation (Theorem B_H) supported by formal derivation"
+  weak_or_uncertain:
+    - "External validity to deployed systems (acknowledged limitation)"
+    - "Equivalence to other operationalizations (future work)"
+
+cross_validation:
+  - "Implementation (cap_oci_v036.py) matches protocol specification"
+  - "onset_rate formula verified across multiple sources"
+  - "Wilson/Cantelli LCB formulas verified in code"
+  - "Threshold asymmetry (L3_sel) documented in both spec and exceptions"

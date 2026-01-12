@@ -1,0 +1,16 @@
+{
+  "version": "v0.3.6p15.2ABv6",
+  "selfcheck_ok": false,
+  "full_eval_complete": true,
+  "protocol_complete": true,
+  "claim_ready": true,
+  "claim_b_strong": true,
+  "failed_checks": [],
+  "artifacts": {
+    "audit_runs.jsonl": "405545a9979ecb5479043e1ff583d9c4084c81cd5f8ce3da1516342d778a7f66",
+    "DONE.json": "1fa50922a7ccc8c646f6ed47108dbf98f8fad073b393c21642196785e7a212ff",
+    "repro_manifest.json": "eceee5470bb13c6b0b9b4bbafa1a70b5a894ab0216bd2961af228fc44240537b",
+    "artifacts_manifest.json": "649485df1d7f0210b97c2780981d2699310760cd8c95556ca17b0580d27889c8",
+    "CAP_PASS_REPORT.md": "9eb591d72e2f4bfc1ead0c079d25eb4b5592a3d60a231320ff3b226d6ae167d9"
+  }
+}

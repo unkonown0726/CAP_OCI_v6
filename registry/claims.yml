@@ -1,0 +1,221 @@
+# claims.yml - Final Registry (CAP+OCI v6)
+# Generated: 2026-01-12
+
+# =============================================================================
+# Core Claims (Per-Environment)
+# =============================================================================
+
+C001:
+  claim_id: CLAIM_A
+  statement: |
+    Onset crossing exists under g (regime transition)
+    AND max(onset_rate) ≥ 0.30
+    AND min_inadeq ≤ 0.10
+  formal_condition: |
+    crossing exists
+    ∧ max_g(onset_rate(g)) ≥ P_PASS (0.30)
+    ∧ min_g(inadeq(g)) ≤ 0.10
+  type: per_environment
+  source:
+    file: 2_PROTOCOL_APPENDIX.txt
+    section: "H. Claims"
+  depends_on: [D011, D012, D023]
+  thresholds:
+    P_PASS: 0.30
+    P_FAIL: 0.10
+    max_inadeq: 0.10
+
+C002:
+  claim_id: CLAIM_B
+  statement: |
+    Weak robustness exists: CLAIM_A AND
+    ∃g such that OR_LCB(g) ≥ 0.15 with sufficient support (n_onset ≥ 20)
+  formal_condition: |
+    CLAIM_A
+    ∧ ∃g: (n_onset(g) ≥ 20 ∧ OR_LCB(g) ≥ R_PASS)
+  type: per_environment
+  source:
+    file: 2_PROTOCOL_APPENDIX.txt
+    section: "H. Claims"
+  depends_on: [C001, D013, A007]
+  thresholds:
+    R_PASS: 0.15
+    min_onset: 20
+
+C003:
+  claim_id: CLAIM_B+
+  statement: |
+    Strong robustness exists: CLAIM_A AND
+    ∃g such that AND_LCB(g) ≥ 0.05 with sufficient support
+  formal_condition: |
+    CLAIM_A
+    ∧ ∃g: (n_onset(g) ≥ 20 ∧ AND_LCB(g) ≥ R_STRONG)
+  type: per_environment
+  optional: true (report-only)
+  source:
+    file: 2_PROTOCOL_APPENDIX.txt
+    section: "H. Claims"
+  depends_on: [C001, D014, A007]
+  thresholds:
+    R_STRONG: 0.05
+    min_onset: 20
+
+C004:
+  claim_id: CLAIM_C
+  statement: |
+    CLAIM_B AND ∃g such that selective_all(g) == True
+    (mechanistic specificity via lesion-based selective collapse)
+  formal_condition: |
+    CLAIM_B
+    ∧ ∃g: selective_all(g)
+  type: per_environment
+  source:
+    file: 2_PROTOCOL_APPENDIX.txt
+    section: "H. Claims"
+  depends_on: [C002, D017]
+  interpretation: |
+    When CLAIM_B satisfied, provides additional mechanistic evidence.
+    Strengthens overall claim.
+
+# =============================================================================
+# Robustness Claims
+# =============================================================================
+
+C005:
+  claim_id: threshold_invariance
+  statement: |
+    32-combination sweep shows ALL combinations achieve claim_ready = True
+  sweep_parameters:
+    R_PASS: [0.10, 0.15, 0.20, 0.25]
+    R_STRONG: [0.05, 0.10]
+    theta_lead: [0.00, -0.05]
+    theta_rec: [0.00, -0.05]
+  type: robustness_check
+  source:
+    file: 1_MANUSCRIPT.txt / 0_CAP_OCI_v6_Results.txt
+    section: "4.2 Threshold Sensitivity"
+  depends_on: [C002]
+  interpretation: |
+    Conclusion is NOT an artifact of narrow threshold tuning.
+
+C006:
+  claim_id: reproducibility
+  statement: |
+    3 independent full evaluations:
+    claim_ready = True AND claim_b_strong = True remain stable.
+  type: reproducibility_evidence
+  source:
+    file: 1_MANUSCRIPT.txt
+    section: "4.3 Reproducibility"
+  depends_on: [C002, C003]
+
+# =============================================================================
+# Empirical Results
+# =============================================================================
+
+C010:
+  claim_id: EnvA_grid_results
+  statement: |
+    EnvA_grid: CLAIM_A, B, B+, C ALL True.
+    Crossing direction: down (PASS at g ≤ 0.5, FAIL at g ≥ 0.75)
+    max_onset_rate = 1.000
+  type: empirical_result
+  data:
+    g_1.00: {onset_rate: 0.000, n_onset: 0, robust: FAIL}
+    g_0.75: {onset_rate: 0.000, n_onset: 0, robust: FAIL}
+    g_0.50: {onset_rate: 0.348, n_onset: 32, OR_LCB: 0.819, AND_LCB: 0.360, robust: PASS, strong: PASS}
+    g_0.25: {onset_rate: 0.962, n_onset: 76, OR_LCB: 0.841, AND_LCB: 0.204, robust: PASS, strong: PASS}
+    g_0.00: {onset_rate: 1.000, n_onset: 73, OR_LCB: 0.713, AND_LCB: 0.188, robust: PASS, strong: PASS}
+  source:
+    file: 0_CAP_OCI_v6_Results.txt / CAP_PASS_REPORT.md
+  depends_on: [C001, C002, C003, C004]
+
+C011:
+  claim_id: EnvB_continuous_results
+  statement: |
+    EnvB_continuous: CLAIM_A, B, B+, C ALL True.
+    Crossing direction: up (FAIL at g = 0.0, PASS at g ≥ 0.25)
+    max_onset_rate = 0.670
+  type: empirical_result
+  data:
+    g_1.00: {onset_rate: 0.430, n_onset: 39, OR_LCB: 0.790, AND_LCB: 0.510, robust: PASS, strong: PASS}
+    g_0.75: {onset_rate: 0.640, n_onset: 61, OR_LCB: 0.560, AND_LCB: 0.320, robust: PASS, strong: PASS}
+    g_0.50: {onset_rate: 0.670, n_onset: 67, OR_LCB: 0.320, AND_LCB: 0.090, robust: PASS, strong: PASS}
+    g_0.25: {onset_rate: 0.580, n_onset: 58, OR_LCB: 0.160, AND_LCB: 0.010, robust: PASS, strong: FAIL}
+    g_0.00: {onset_rate: 0.010, n_onset: 1, robust: FAIL, strong: FAIL}
+  source:
+    file: 0_CAP_OCI_v6_Results.txt / CAP_PASS_REPORT.md
+  depends_on: [C001, C002, C003, C004]
+
+# =============================================================================
+# Addendum Generalization Claims
+# =============================================================================
+
+C020:
+  claim_id: seed_replication (Addendum A)
+  statement: |
+    Independent seed sets C and D both achieve claim_ready = True.
+    Confirms seed distribution robustness.
+  type: generalization_evidence
+  source:
+    file: Addendum_A_summary.md
+  depends_on: [C002]
+
+C021:
+  claim_id: stochastic_noise (Addendum B)
+  statement: |
+    EnvE (stochastic noise) preserves crossing and claim_B.
+    Noise parameters: ACTION_SLIP=0.1, OBS_NOISE=0.05, REWARD_NOISE=0.02
+  type: generalization_evidence
+  source:
+    file: Addendum_B_summary_full_eval.md
+  depends_on: [C002]
+
+C022:
+  claim_id: partial_observability (Addendum C)
+  statement: |
+    EnvB_PO (velocity hidden) preserves crossing and claim_B.
+  type: generalization_evidence
+  source:
+    file: Addendum_C_summary_full_eval.md
+  depends_on: [C002]
+
+C023:
+  claim_id: hmm_nonstationarity (Addendum D)
+  statement: |
+    EnvA_HMM (hidden reward mode) preserves crossing and claim_B.
+    Switch probability 0.02 after 30-step dwell.
+  type: generalization_evidence
+  source:
+    file: Addendum_D_summary_full_eval.md
+  depends_on: [C002]
+
+C024:
+  claim_id: high_dimensional (Addendum F)
+  statement: |
+    EnvC_highd (D=32) preserves crossing and claim_B.
+    Generalizes to high-dimensional observations.
+  type: generalization_evidence
+  source:
+    file: Addendum_F_summary_full_eval.md
+  depends_on: [C002]
+
+# =============================================================================
+# Theoretical Claim (from Convergence Dynamics)
+# =============================================================================
+
+C007:
+  claim_id: Theorem_B_H
+  statement: |
+    S_obs^(P) ≥ c_data^eff · A_m · c_model* · v_eval
+    RHS is entirely from exogenous supply or evaluation-side observables,
+    NOT depending on S_obs^(P) estimation itself.
+  type: theoretical_theorem
+  source:
+    file: 7_Convergence_Dynamics.txt
+    section: "8. Main Theorem B_H"
+  depends_on: [A014-A023]
+  conditions:
+    - Irreversibility (v* ≠ 0)
+    - Assumptions A1-A9'
+    - split/CF separation

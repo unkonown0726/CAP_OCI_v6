@@ -1,0 +1,10 @@
+{
+  "version": "v0.3.6p15.2ABv6",
+  "python": "3.10.19",
+  "numpy": "2.2.6",
+  "platform": "Windows-10-10.0.26200-SP0",
+  "pip_freeze_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "determinism_settings": {
+    "PYTHONHASHSEED": null
+  }
+}

@@ -1,0 +1,313 @@
+# exceptions_edgecases.yml - Final Registry (CAP+OCI v6)
+# Generated: 2026-01-12
+
+# =============================================================================
+# Terminal Falsification Conditions
+# =============================================================================
+
+X001:
+  description: |
+    candidate_set_mismatch == True → Seed immediately rejected from onset.
+    Hard failure. Candidate sets changed under intervention, breaking measurement causality.
+  trigger: "candidate_set_mismatch == True"
+  effect: "Seed rejected from onset calculation; CM claim falsified if widespread"
+  source:
+    file: 2_PROTOCOL_APPENDIX.txt / 8_CM_Operational_Definition.txt
+    section: "D. Stage A / 6. Falsification"
+  severity: terminal
+  depends_on: [D010]
+
+X002:
+  description: |
+    Metrics contain NaN or Inf → Seed rejected from onset.
+  trigger: "any required metric is NaN/Inf"
+  effect: "Seed rejected from onset calculation"
+  source:
+    file: 2_PROTOCOL_APPENDIX.txt
+    section: "D. Stage A"
+  severity: per_seed
+  depends_on: []
+
+X011:
+  description: |
+    Theta-freeze violation (Q changes during evaluation) →
+    Terminal falsification of CM claim.
+  trigger: "Q (learning parameters) changed during evaluation"
+  effect: "CM claim immediately falsified"
+  source:
+    file: 8_CM_Operational_Definition.txt
+    section: "6. Falsification Conditions"
+  severity: terminal
+  depends_on: [A012]
+
+X012:
+  description: |
+    Post-hoc metric generation (outside cap_stream) → Suspected fabrication.
+    F metrics fabricable via separate loop re-simulation or post-processing.
+  trigger: "Metrics generated outside cap_stream"
+  effect: "Claim rejected as suspected fabrication"
+  source:
+    file: 8_CM_Operational_Definition.txt
+    section: "6. Falsification Conditions"
+  severity: terminal
+  depends_on: []
+
+X019:
+  description: |
+    Crossing absence: If phase transition is main claim, boundary absence means
+    claim not established.
+  trigger: "pass_g = ∅ OR fail_g = ∅"
+  effect: "CLAIM_A not established"
+  source:
+    file: 8_CM_Operational_Definition.txt
+    section: "6. Falsification Conditions"
+  severity: claim_failure
+  depends_on: [D023]
+
+# =============================================================================
+# Statistical/Sample Size Constraints
+# =============================================================================
+
+X003:
+  description: |
+    n_onset(g) < 20 → Stage B PASS/FAIL not asserted at this g.
+    Insufficient sample size for statistically significant conclusion.
+  trigger: "n_onset(g) < 20 (full_eval)"
+  effect: "Stage B claims suspended at this g; rates shown for transparency only"
+  source:
+    file: 2_PROTOCOL_APPENDIX.txt / 0_CAP_OCI_v6_Results.txt
+    section: "E. Stage B"
+  severity: per_g
+  depends_on: [A007]
+  note: "See note in results: 'Rows with n_onset < min_required may be unreliable'"
+
+X014:
+  description: |
+    env_inadequate dominant: Observation device inadequacy is prevalent.
+    This is protocol failure (measurement impossible), NOT CM negation.
+  trigger: "env_inadequate in majority of seeds"
+  effect: "Protocol failure, not CM rejection"
+  source:
+    file: 8_CM_Operational_Definition.txt
+    section: "6. Falsification Conditions"
+  severity: protocol_failure
+  depends_on: [D009]
+  note: "Adequacy condition: min_inadeq ≤ 0.10"
+
+# =============================================================================
+# Implementation-Critical Edge Cases
+# =============================================================================
+
+X004:
+  description: |
+    L3_sel threshold asymmetry: CRITICAL implementation detail.
+    F4_meta_lead uses "≤ 0" (includes equality) for collapse
+    F4_recovery_gain uses "< 0" (excludes equality) for collapse
+    Other lesions (L1, L2) use "< 0" uniformly.
+  trigger: "L3 lesion evaluation"
+  effect: "F4_meta_lead ≤ 0 vs F4_recovery_gain < 0"
+  source:
+    file: 2_PROTOCOL_APPENDIX.txt
+    section: "F. Stage C"
+  severity: implementation_critical
+  depends_on: [D020]
+  note: "特に注意が必要な非対称性。実装時に混同しないこと。"
+
+X010:
+  description: |
+    onset_rate の分母定義:
+    onset_rate = n_onset / n_adequate (NOT n_onset / N_total)
+    n_adequate = N_total - n_env_inadequate
+  trigger: "onset_rate calculation"
+  effect: "Denominator is adequate seeds, not total seeds"
+  source:
+    file: 2_PROTOCOL_APPENDIX.txt / addendum_F_highd
+    section: "D. Stage A"
+  severity: implementation_critical
+  depends_on: [D011]
+  note: "実装時に分母の定義に注意"
+
+X020:
+  description: |
+    onset_rate 定義の潜在的仕様不整合 (status: uncertain)
+    PROTOCOL_APPENDIX: "adequate seeds で割る"
+    CM_Operational_Definition: "(1/N) × Σ1{...}" と記載
+    実装コードでは n_adequate で割っている (正しい)
+  type: potential_inconsistency
+  status: uncertain
+  source:
+    file: 8_CM_Operational_Definition.txt vs 2_PROTOCOL_APPENDIX.txt
+    verification: src/cap_oci_v036.py confirmed adequate seeds
+  resolution: |
+    実装 (cap_oci_v036.py) では n_adequate で割っており、
+    PROTOCOL_APPENDIX と一致。CM_Operational_Definition の記載は
+    簡略化された表現と解釈。
+
+# =============================================================================
+# Lesion Design Constraints
+# =============================================================================
+
+X013:
+  description: |
+    Total collapse (non-selective collapse): All metrics uniformly collapse under lesions.
+    Causal separation fails. CLAIM_C not established.
+  trigger: "L1/L2/L3 のいずれかで全メトリクスが collapse"
+  effect: "Selective collapse 不成立、CLAIM_C 不成立"
+  source:
+    file: 8_CM_Operational_Definition.txt
+    section: "6. Falsification Conditions"
+  severity: claim_failure
+  depends_on: [D017]
+
+X018:
+  description: |
+    Lesion is total destruction → Selective collapse impossible.
+    Lesion should be module-level blocking, not total stop.
+  trigger: "Lesion がすべての metrics を破壊"
+  effect: "Selective collapse impossible, CLAIM_C fails"
+  source:
+    file: 9_Supplement_S-AI.txt
+    section: "S6. Porting Pitfall Checklist / S14"
+  severity: design_error
+  depends_on: [A026]
+
+# =============================================================================
+# Protocol Violations
+# =============================================================================
+
+X015:
+  description: |
+    g をシードごとに最適化してはならない。
+    Post-hoc adjustment prohibited.
+  trigger: "g が per-seed で調整"
+  effect: "External reviewers will suspect arbitrariness"
+  source:
+    file: 9_Supplement_S-AI.txt
+    section: "S6. Porting Pitfall Checklist"
+  severity: protocol_violation
+  depends_on: [A011]
+
+X016:
+  description: |
+    Crossing を Stage B で定義してはならない。
+    Crossing は Stage A onset_rate のみで定義。
+  trigger: "Crossing を Stage B で定義"
+  effect: "Protocol violation"
+  source:
+    file: 9_Supplement_S-AI.txt
+    section: "S6. Porting Pitfall Checklist"
+  severity: protocol_violation
+  depends_on: [D023]
+
+X017:
+  description: |
+    Stage B を onset condition なしで評価してはならない。
+    Stage B は onset seeds に条件付き。
+  trigger: "Onset 条件なしで Stage B 評価"
+  effect: "Protocol violation"
+  source:
+    file: 9_Supplement_S-AI.txt
+    section: "S6. Porting Pitfall Checklist"
+  severity: protocol_violation
+  depends_on: [C002]
+
+# =============================================================================
+# Non-Circularity Violations
+# =============================================================================
+
+X021:
+  description: |
+    Primary/Secondary firewall violation:
+    Secondary diagnostics (PC-χ, h_2) に基づいて decision を変更してはならない。
+  trigger: "Secondary results に基づいて analysis 変更"
+  effect: "Circularity violation, falsifiability lost"
+  source:
+    file: 7_Convergence_Dynamics.txt
+    section: "Appendix N.3 Prohibitions"
+  severity: protocol_violation
+  depends_on: [A024]
+
+X022:
+  description: |
+    Exploration side での re-learning/re-selection を evaluation side で行ってはならない。
+  trigger: "Evaluation side で re-learning"
+  effect: "Non-circularity violation"
+  source:
+    file: 7_Convergence_Dynamics.txt
+    section: "Appendix N.3 Prohibitions"
+  severity: protocol_violation
+  depends_on: [A019]
+
+X023:
+  description: |
+    α allocation / threshold / bandwidth / λ_clip を evaluation 中に変更してはならない。
+  trigger: "Evaluation 中にパラメータ変更"
+  effect: "Non-circularity violation"
+  source:
+    file: 7_Convergence_Dynamics.txt
+    section: "Appendix N.3 Prohibitions"
+  severity: protocol_violation
+  depends_on: [A019]
+
+# =============================================================================
+# Interpretation Limitations
+# =============================================================================
+
+X005:
+  description: |
+    Selective collapse is mechanistic evidence, NOT uniqueness proof.
+    Other mechanisms might produce similar patterns.
+  type: interpretation_limitation
+  source:
+    file: 1_MANUSCRIPT.txt
+    section: "6. Limitations"
+  severity: interpretation
+  depends_on: [C004]
+
+X006:
+  description: |
+    Protocol does NOT establish:
+    - Subjective experience
+    - Moral status
+    - Personhood
+    - Equivalence to human consciousness
+    Evaluation framework for observable dynamics only.
+  type: scope_limitation
+  source:
+    file: 1_MANUSCRIPT.txt
+    section: "5.2 What the Protocol Does Not Support"
+  severity: fundamental_limitation
+  depends_on: [A009]
+
+X007:
+  description: |
+    Environment and agent are synthetic.
+    External validity to deployed systems must be tested separately.
+  type: external_validity_limitation
+  source:
+    file: 1_MANUSCRIPT.txt
+    section: "6. Limitations"
+  severity: generalization_limitation
+  depends_on: [A010]
+
+X008:
+  description: |
+    Metrics are protocol-defined.
+    Alternative operationalizations should be compared.
+  type: operationalization_limitation
+  source:
+    file: 1_MANUSCRIPT.txt
+    section: "6. Limitations"
+  severity: methodological_limitation
+  depends_on: []
+
+X009:
+  description: |
+    g is single knob.
+    Multi-parameter control surfaces are future work.
+  type: design_limitation
+  source:
+    file: 1_MANUSCRIPT.txt
+    section: "6. Limitations"
+  severity: scope_limitation
+  depends_on: [A001]

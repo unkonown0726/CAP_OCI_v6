@@ -1,0 +1,166 @@
+# theorem_contracts.yml - Final Registry (CAP+OCI v6)
+# Generated: 2026-01-12
+
+# =============================================================================
+# Claim Contracts (必要条件→結論→適用域→依存定義→例外→実装検証項目)
+# =============================================================================
+
+T001:
+  claim_ref: C001 (CLAIM_A)
+  preconditions:
+    - "N seeds evaluated at each g ∈ G0 = {1.00, 0.75, 0.50, 0.25, 0.00}"
+    - "Metrics F1_IG, F3_delta_act, F3_delta_perf computed per run"
+    - "Flags env_inadequate, candidate_set_mismatch tracked"
+    - "env_inadequate seeds excluded from onset_rate denominator"
+  conclusion: |
+    Regime transition exists:
+    pass_g ≠ ∅ ∧ fail_g ≠ ∅ ∧ max(onset_rate) ≥ 0.30 ∧ min(inadeq) ≤ 0.10
+  applicability:
+    - "Per-environment assertion (EnvA_grid and EnvB_continuous independently)"
+    - "Fixed seed list (N=100 for full_eval)"
+  dependent_definitions:
+    - D003 (F1_IG)
+    - D005 (F3_delta_act)
+    - D006 (F3_delta_perf)
+    - D009 (env_inadequate)
+    - D010 (candidate_set_mismatch)
+    - D011 (onset_rate)
+    - D012 (inadeq)
+    - D021 (pass_g)
+    - D022 (fail_g)
+    - D023 (crossing)
+  exceptions:
+    - X001 (candidate_set_mismatch rejection)
+    - X002 (NaN/Inf metric rejection)
+    - X010 (onset_rate denominator definition)
+  implementation_checks:
+    - "onset_rate 計算時に env_inadequate シードを分母から除外しているか"
+    - "candidate_set_mismatch が True のシードを除外しているか"
+    - "NaN/Inf のメトリクスを持つシードを除外しているか"
+    - "F1_ONSET_MIN = 0.0 を使用しているか (F1_IG > 0 の条件)"
+    - "P_PASS = 0.30, P_FAIL = 0.10 の閾値が正しいか"
+
+T002:
+  claim_ref: C002 (CLAIM_B)
+  preconditions:
+    - "CLAIM_A satisfied"
+    - "n_onset(g) ≥ 20 at some g (full_eval requirement)"
+    - "Wilson LCB computed with α = 0.10 (one-sided)"
+    - "Stage B evaluated on onset seeds with env_inadequate == False"
+  conclusion: |
+    ∃g: OR_LCB(g) ≥ 0.15
+  applicability:
+    - "Conditional on onset seeds only"
+    - "Per-environment assertion"
+  dependent_definitions:
+    - D007 (F4_meta_lead)
+    - D008 (F4_recovery_gain)
+    - D013 (OR_LCB)
+    - D015 (Wilson LCB)
+  dependent_assumptions:
+    - A006 (α = 0.10)
+    - A007 (min_onset = 20)
+  exceptions:
+    - X003 (insufficient n_onset)
+    - X017 (onset condition omission)
+  implementation_checks:
+    - "Wilson LCB の計算が正しいか (one-sided, α=0.10)"
+    - "OR_LCB = max(LCB(meta), LCB(rec)) として計算しているか"
+    - "n_onset < 20 の場合は PASS/FAIL を主張しないこと"
+    - "θ_lead = 0.0, θ_rec = 0.0 をデフォルトとして使用"
+    - "Stage B 評価は onset seeds のみに条件付き"
+
+T003:
+  claim_ref: C003 (CLAIM_B+)
+  preconditions:
+    - "CLAIM_A satisfied"
+    - "n_onset(g) ≥ 20 at some g"
+    - "Wilson LCB computed with α = 0.10"
+  conclusion: |
+    ∃g: AND_LCB(g) ≥ 0.05
+  applicability:
+    - "Optional stronger claim (report-only)"
+    - "AND success = (meta success ∧ recovery success)"
+  dependent_definitions:
+    - D007 (F4_meta_lead)
+    - D008 (F4_recovery_gain)
+    - D014 (AND_LCB)
+    - D015 (Wilson LCB)
+  dependent_assumptions:
+    - A006 (α = 0.10)
+    - A007 (min_onset = 20)
+  exceptions:
+    - X003 (insufficient n_onset)
+  implementation_checks:
+    - "AND success の定義: meta success AND recovery success"
+    - "AND_LCB = LCB(and_rate) として計算"
+
+T004:
+  claim_ref: C004 (CLAIM_C)
+  preconditions:
+    - "CLAIM_B satisfied"
+    - "Lesions L1, L2, L3 applied at same g"
+    - "Cantelli LCB computed for each lesion (α = 0.10)"
+  conclusion: |
+    ∃g: selective_all(g) = L1_sel(g) ∧ L2_sel(g) ∧ L3_sel(g)
+  applicability:
+    - "Unconditional evaluation under lesions at same g"
+    - "Provides mechanistic specificity evidence"
+  dependent_definitions:
+    - D016 (Cantelli LCB)
+    - D017 (selective_all)
+    - D018 (L1_sel)
+    - D019 (L2_sel)
+    - D020 (L3_sel)
+  exceptions:
+    - X004 (L3 threshold asymmetry)
+    - X005 (not uniqueness proof)
+    - X013 (total collapse)
+    - X018 (total destruction lesion)
+  implementation_checks:
+    - "Cantelli LCB: mean - √((1-α)/(αn)) × std (ddof=1)"
+    - "L1_sel: F1 < 0 AND (F2 ≥ 0 OR F4_meta ≥ 0 OR F4_rec ≥ 0)"
+    - "L2_sel: F2 < 0 AND (F1 ≥ 0 OR F4_meta ≥ 0 OR F4_rec ≥ 0)"
+    - "L3_sel: (F4_meta ≤ 0 OR F4_rec < 0) AND (F1 ≥ 0 OR F2 ≥ 0)"
+    - "CRITICAL: L3 の閾値非対称性 (≤ vs <) に注意"
+
+T005:
+  claim_ref: claim_ready (package-level)
+  preconditions:
+    - "CLAIM_B evaluated in both EnvA_grid and EnvB_continuous"
+  conclusion: |
+    claim_ready = True iff CLAIM_B holds in BOTH environments
+  applicability:
+    - "Package-level declaration"
+    - "Engineering flag for protocol completion"
+  dependent_definitions:
+    - D024 (claim_ready)
+  dependent_claims:
+    - C002 (CLAIM_B)
+  exceptions: []
+  implementation_checks:
+    - "両環境で独立に CLAIM_B を評価"
+    - "一方でも CLAIM_B = False なら claim_ready = False"
+
+T006:
+  claim_ref: seed_onset_pass (Stage A per-seed gate)
+  preconditions:
+    - "Per-run metrics computed"
+  conclusion: |
+    seed_onset_pass(m) = True iff:
+      NOT candidate_set_mismatch
+      AND all metrics finite
+      AND F3_delta_act > 0
+      AND F3_delta_perf > 0
+      AND F1_IG > F1_ONSET_MIN (= 0.0)
+  applicability:
+    - "Per-seed evaluation"
+  dependent_definitions:
+    - D003, D005, D006, D009, D010
+  implementation_checks:
+    - "candidate_set_mismatch → False"
+    - "np.isfinite check for F1_IG, F2_RT, F3_delta_act, F3_delta_perf"
+    - "F3_delta_act > 0 AND F3_delta_perf > 0"
+    - "F1_IG > 0.0 (F1_ONSET_MIN)"
+  source:
+    file: src/cap_oci_v036.py:2060-2072

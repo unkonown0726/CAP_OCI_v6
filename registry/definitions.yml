@@ -1,0 +1,436 @@
+# definitions.yml - Final Registry (CAP+OCI v6)
+# Generated: 2026-01-12
+# Sources: 1_MANUSCRIPT, 2_PROTOCOL_APPENDIX, 3-12_supplements, implementation, results
+
+# =============================================================================
+# Core Protocol Parameters
+# =============================================================================
+
+D001:
+  term: g (g-knob)
+  definition: |
+    Scalar control parameter applied uniformly to observation→internal coupling.
+    Induces regime transition, not merely monotonic performance tuning.
+  aliases: [g, g-knob, g-scan, gamma, γ]
+  type: scalar_parameter
+  domain: "{1.00, 0.75, 0.50, 0.25, 0.00}"
+  constraints:
+    - Fixed during single run (per-seed post-hoc adjustment prohibited)
+    - Acts consistently on observation→internal coupling
+  source:
+    file: 1_MANUSCRIPT.txt / 2_PROTOCOL_APPENDIX.txt
+    section: "2.1 The g-knob"
+  depends_on: []
+
+D002:
+  term: CM (Conscious-Mode / Consciousness Modality)
+  definition: |
+    Operationally defined dynamic phenomenon. NOT a claim of subjective experience.
+    Established when E ∧ F ∧ C simultaneously hold:
+      E: Emergence (crossing)
+      F: Fingerprint (F1-F4)
+      C: Selective collapse
+  aliases: [CM, conscious-mode, Consciousness Modality, CM dynamics]
+  type: conceptual_construct
+  source:
+    file: 8_CM_Operational_Definition.txt / 12_Memory_Learning_Separation.txt
+    section: "Definition"
+  depends_on: [D023, D027-D032]
+  note: Explicitly does NOT assert subjective experience, moral status, personhood
+
+# =============================================================================
+# Metrics (F1-F4 + Flags)
+# =============================================================================
+
+D003:
+  term: F1_IG (Integrated Gain)
+  definition: |
+    Integration advantage metric. Positive overlap / integration signature.
+    Evidence for Axiom 1 (Integration).
+  aliases: [F1_IG, F1, integration advantage, integrated gain]
+  type: metric
+  unit: dimensionless
+  onset_condition: "> 0 (equivalently > F1_ONSET_MIN = 0.0)"
+  source:
+    file: 1_MANUSCRIPT.txt / src/cap_oci_v036.py:2070
+  depends_on: []
+
+D004:
+  term: F2_RT (Rollout Trace)
+  definition: |
+    Rollout/counterfactual trace indicator.
+    Evidence for Axiom 2 (Counterfactual).
+  aliases: [F2_RT, F2, rollout trace, counterfactual test]
+  type: metric
+  unit: dimensionless
+  source:
+    file: 1_MANUSCRIPT.txt
+  depends_on: []
+  note: In v6, not required for onset but materialized through Stage C
+
+D005:
+  term: F3_delta_act
+  definition: |
+    Self-causality delta (action). Intervention on self-channel changes action distribution.
+    Evidence for Axiom 3 (Self-Channel Causality).
+  aliases: [F3_delta_act, delta_act]
+  type: metric
+  unit: dimensionless
+  onset_condition: "> 0"
+  source:
+    file: 1_MANUSCRIPT.txt
+  depends_on: []
+
+D006:
+  term: F3_delta_perf
+  definition: |
+    Self-causality delta (performance). Intervention on self-channel changes performance.
+    Evidence for Axiom 3 (Self-Channel Causality).
+  aliases: [F3_delta_perf, delta_perf]
+  type: metric
+  unit: dimensionless
+  onset_condition: "> 0"
+  source:
+    file: 1_MANUSCRIPT.txt
+  depends_on: []
+
+D007:
+  term: F4_meta_lead
+  definition: |
+    Meta-lead robustness route metric.
+    Evidence for Axiom 4 (Metastability) - collapse precursor detection.
+  aliases: [F4_meta_lead, meta_lead, meta route]
+  type: metric
+  unit: dimensionless
+  stage_b_condition: "> θ_lead (default 0.0)"
+  source:
+    file: 1_MANUSCRIPT.txt
+  depends_on: []
+
+D008:
+  term: F4_recovery_gain
+  definition: |
+    Recovery robustness route metric.
+    Evidence for Axiom 4 (Metastability) - recovery capability.
+  aliases: [F4_recovery_gain, recovery_gain, recovery route]
+  type: metric
+  unit: dimensionless
+  stage_b_condition: "> θ_rec (default 0.0)"
+  source:
+    file: 1_MANUSCRIPT.txt
+  depends_on: []
+
+D009:
+  term: env_inadequate
+  definition: |
+    Insufficient event support flag. True when F4 event count < K_min.
+    This is "measurement impossible" NOT "failure".
+  aliases: [env_inadequate, inadequate flag, event insufficient]
+  type: flag (boolean)
+  source:
+    file: 3_SUPPLEMENT_AGENT_TRANSFER.txt
+  depends_on: []
+  note: Must NOT be conflated with failure
+
+D010:
+  term: candidate_set_mismatch
+  definition: |
+    Falsification terminal (hard failure). Candidate sets change under intervention.
+    Breaks measurement causality. Terminal condition for CM claim.
+  aliases: [candidate_set_mismatch, mismatch]
+  type: flag (boolean)
+  source:
+    file: 8_CM_Operational_Definition.txt
+  depends_on: []
+
+# =============================================================================
+# Derived Quantities
+# =============================================================================
+
+D011:
+  term: onset_rate
+  definition: |
+    onset_rate(g) = n_onset(g) / n_adequate(g)
+    Ratio of onset seeds among adequate seeds (NOT total seeds).
+  aliases: [onset_rate]
+  type: rate
+  domain: "[0, 1]"
+  source:
+    file: 2_PROTOCOL_APPENDIX.txt / addendum_F_highd
+  depends_on: [D003, D005, D006, D009, D010]
+  note: Denominator is n_adequate, not N_total
+
+D012:
+  term: inadeq(g)
+  definition: |
+    inadeq(g) = n_env_inadequate / N_seeds
+    Fraction of inadequate seeds out of total.
+  aliases: [inadeq, inadequacy rate]
+  type: rate
+  domain: "[0, 1]"
+  source:
+    file: addendum_F_highd
+  depends_on: [D009]
+
+D013:
+  term: OR_LCB(g)
+  definition: |
+    OR_LCB(g) = max(LCB(meta_rate), LCB(recovery_rate))
+    Wilson LCB of the better-performing route.
+  aliases: [OR_LCB, OR lower bound]
+  type: statistic
+  source:
+    file: 2_PROTOCOL_APPENDIX.txt
+  depends_on: [D007, D008, D015]
+
+D014:
+  term: AND_LCB(g)
+  definition: |
+    AND_LCB(g) = LCB(and_rate)
+    Wilson LCB of (meta success AND recovery success) rate.
+  aliases: [AND_LCB, AND lower bound]
+  type: statistic
+  source:
+    file: 2_PROTOCOL_APPENDIX.txt
+  depends_on: [D007, D008, D015]
+
+D015:
+  term: Wilson one-sided LCB
+  definition: |
+    Wilson score one-sided lower confidence bound for binomial proportion.
+    Formula: (center - margin) / denom
+    where z = inv_cdf(1 - α), α = 0.10
+  aliases: [Wilson LCB, LCB, Wilson one-sided LCB]
+  type: statistical_method
+  parameters:
+    alpha: 0.10
+  source:
+    file: src/cap_oci_v036.py:315-327
+  depends_on: []
+
+D016:
+  term: Cantelli LCB
+  definition: |
+    Cantelli inequality-based LCB for continuous values.
+    Formula: LCB = x̄ - √((1-α)/(αn)) × s
+    where s = unbiased std (ddof=1), α = 0.10
+  aliases: [Cantelli LCB, Cantelli lower bound]
+  type: statistical_method
+  parameters:
+    alpha: 0.10
+  source:
+    file: 8_CM_Operational_Definition.txt / src/cap_oci_v036.py:283-292
+  depends_on: []
+
+D017:
+  term: selective_all(g)
+  definition: |
+    selective_all(g) = L1_sel(g) ∧ L2_sel(g) ∧ L3_sel(g)
+    All three selective collapse conditions simultaneously satisfied.
+  aliases: [selective_all, selective collapse all]
+  type: boolean_condition
+  source:
+    file: 2_PROTOCOL_APPENDIX.txt
+  depends_on: [D018, D019, D020]
+
+D018:
+  term: L1_sel(g)
+  definition: |
+    Under L1_integration_off lesion:
+    F1_IG < 0 (collapses) AND
+    (F2_RT ≥ 0 OR F4_meta_lead ≥ 0 OR F4_recovery_gain ≥ 0) (at least one remains)
+  aliases: [L1_sel, L1 selective]
+  type: boolean_condition
+  source:
+    file: 2_PROTOCOL_APPENDIX.txt
+  depends_on: [D003, D004, D007, D008]
+
+D019:
+  term: L2_sel(g)
+  definition: |
+    Under L2_rollout_off lesion:
+    F2_RT < 0 (collapses) AND
+    (F1_IG ≥ 0 OR F4_meta_lead ≥ 0 OR F4_recovery_gain ≥ 0) (at least one remains)
+  aliases: [L2_sel, L2 selective]
+  type: boolean_condition
+  source:
+    file: 2_PROTOCOL_APPENDIX.txt
+  depends_on: [D003, D004, D007, D008]
+
+D020:
+  term: L3_sel(g)
+  definition: |
+    Under L3_meta_off lesion:
+    (F4_meta_lead ≤ 0 OR F4_recovery_gain < 0) (collapses) AND
+    (F1_IG ≥ 0 OR F2_RT ≥ 0) (at least one remains)
+  aliases: [L3_sel, L3 selective]
+  type: boolean_condition
+  source:
+    file: 2_PROTOCOL_APPENDIX.txt
+  depends_on: [D003, D004, D007, D008]
+  note: |
+    CAUTION: Asymmetric thresholds!
+    F4_meta_lead uses "≤ 0" (includes equality)
+    F4_recovery_gain uses "< 0" (excludes equality)
+
+D021:
+  term: pass_g (crossing)
+  definition: |
+    pass_g = { g | onset_rate(g) ≥ P_PASS }
+    where P_PASS = 0.30
+  aliases: [pass_g, passing g set]
+  type: set
+  source:
+    file: 2_PROTOCOL_APPENDIX.txt
+  depends_on: [D011]
+
+D022:
+  term: fail_g (crossing)
+  definition: |
+    fail_g = { g | onset_rate(g) ≤ P_FAIL }
+    where P_FAIL = 0.10
+  aliases: [fail_g, failing g set]
+  type: set
+  source:
+    file: 2_PROTOCOL_APPENDIX.txt
+  depends_on: [D011]
+
+D023:
+  term: crossing
+  definition: |
+    Crossing exists iff pass_g ≠ ∅ AND fail_g ≠ ∅
+    Direction: up if max(fail_g) < min(pass_g), down if max(pass_g) < min(fail_g)
+  aliases: [crossing, regime crossing, onset crossing]
+  type: boolean_condition
+  source:
+    file: 2_PROTOCOL_APPENDIX.txt
+  depends_on: [D021, D022]
+
+D024:
+  term: claim_ready
+  definition: |
+    claim_ready = True iff CLAIM_B holds in BOTH environments
+    (EnvA_grid AND EnvB_continuous)
+  aliases: [claim_ready]
+  type: package_level_flag
+  source:
+    file: 2_PROTOCOL_APPENDIX.txt
+  depends_on: [C002]
+
+# =============================================================================
+# Axioms (v2.1)
+# =============================================================================
+
+D027:
+  term: Axiom 1 (Integration)
+  definition: |
+    Multi-viewpoint observations share same latent structure.
+    Estimation improves through integration.
+    Evidence: F1_IG > 0
+  type: axiom
+  source:
+    file: 8_CM_Operational_Definition.txt
+  depends_on: [D003]
+
+D028:
+  term: Axiom 2 (Counterfactual)
+  definition: |
+    Candidate action comparison is established.
+    Value differences between candidates are measurable.
+    Evidence: F2_RT
+  type: axiom
+  source:
+    file: 8_CM_Operational_Definition.txt
+  depends_on: [D004]
+
+D029:
+  term: Axiom 3 (Self-Channel Causality)
+  definition: |
+    Intervention on self-channel changes both action and performance.
+    Evidence: F3_delta_act > 0 AND F3_delta_perf > 0
+  type: axiom
+  source:
+    file: 8_CM_Operational_Definition.txt
+  depends_on: [D005, D006]
+
+D030:
+  term: Axiom 4 (Metastability)
+  definition: |
+    Collapse precursor → collapse → recovery established in time series.
+    Evidence: F4_meta_lead, F4_recovery_gain (rate-based evaluation in Stage B)
+  type: axiom
+  source:
+    file: 8_CM_Operational_Definition.txt
+  depends_on: [D007, D008]
+
+D031:
+  term: Axiom 5 (Selective Collapse)
+  definition: |
+    Function-specific lesion causes only targeted metrics to collapse.
+    Others remain. (Causal separation)
+    Evidence: selective_all
+  type: axiom
+  source:
+    file: 8_CM_Operational_Definition.txt
+  depends_on: [D017]
+
+D032:
+  term: Axiom 6 (Criticality)
+  definition: |
+    For continuous knob g, FAIL→PASS boundary (crossing) is observed.
+    Evidence: Stage A onset_rate has crossing on g-scan
+  type: axiom
+  source:
+    file: 8_CM_Operational_Definition.txt
+  depends_on: [D023]
+
+# =============================================================================
+# Memory/Learning Distinction
+# =============================================================================
+
+D040:
+  term: Learning (in CM protocol)
+  definition: |
+    Changes to parameter set Q (rules, weights, thresholds).
+    PROHIBITED during evaluation. Triggers terminal falsification.
+  aliases: [Learning, Q update]
+  type: prohibited_during_evaluation
+  source:
+    file: 11_Memory_Learning_Conditions.txt
+  depends_on: []
+
+D041:
+  term: Memory (in CM protocol)
+  definition: |
+    Preservation and update of state variables.
+    History causally affects next action even with same Q.
+    Required for CM:
+      h_t: prediction error-driven internal state
+      m_t: history-attached state for metastability
+  aliases: [Memory, state retention, h_t, m_t]
+  type: required_for_CM
+  source:
+    file: 12_Memory_Learning_Separation.txt
+  depends_on: []
+
+# =============================================================================
+# Frozen Implementation Parameters
+# =============================================================================
+
+D050:
+  term: Frozen Parameters (v6)
+  definition: |
+    N_TOTAL = 2000 (steps per run)
+    VIEWS = 4 (observation views)
+    D_RAW = 6 (observation dimension, base)
+    K_ROLLOUT = 4 (rollout depth)
+    ALPHA = 0.10 (confidence level)
+    P_PASS = 0.30, P_FAIL = 0.10 (crossing thresholds)
+    R_PASS = 0.15, R_STRONG = 0.05 (robust rate thresholds)
+    N_ONSET_MIN = 20 (minimum onset for Stage B)
+    F1_ONSET_MIN = 0.0 (onset threshold for F1_IG)
+    θ_lead = 0.0, θ_rec = 0.0 (default route thresholds)
+  type: frozen_constants
+  source:
+    file: ROADMAP_COMPLETION_REPORT.md / src/cap_oci_v036.py
+  depends_on: []

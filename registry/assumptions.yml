@@ -1,0 +1,274 @@
+# assumptions.yml - Final Registry (CAP+OCI v6)
+# Generated: 2026-01-12
+
+# =============================================================================
+# Protocol Constraints
+# =============================================================================
+
+A001:
+  statement: |
+    g is a single scalar control parameter applied uniformly
+    to observation→internal coupling.
+  type: model_assumption
+  source:
+    file: 1_MANUSCRIPT.txt
+    section: "2.1 The g-knob"
+  depends_on: [D001]
+  note: Multi-parameter control is future work
+
+A002:
+  statement: |
+    g induces regime transition (not merely monotonic performance tuning).
+  type: behavioral_assumption
+  source:
+    file: 1_MANUSCRIPT.txt
+    section: "2.1 The g-knob"
+  depends_on: [D001]
+
+A003:
+  statement: |
+    Evaluation in 2 environments with distinct dynamics:
+    EnvA_grid and EnvB_continuous
+  type: experimental_design
+  source:
+    file: 1_MANUSCRIPT.txt
+    section: "3.1 Evaluation Design"
+  depends_on: []
+
+A004:
+  statement: |
+    g-grid is fixed: G0 = {1.00, 0.75, 0.50, 0.25, 0.00}
+  type: experimental_design
+  parameters:
+    G0: [1.00, 0.75, 0.50, 0.25, 0.00]
+  source:
+    file: 2_PROTOCOL_APPENDIX.txt
+    section: "B. Inputs"
+  depends_on: [D001]
+
+A005:
+  statement: |
+    Seeds = 100 (fixed seed list for full_eval).
+    Reproducibility requires fixed seed lists.
+  type: experimental_design
+  parameters:
+    N: 100
+  source:
+    file: 2_PROTOCOL_APPENDIX.txt
+  depends_on: []
+
+A006:
+  statement: |
+    Wilson LCB significance level α = 0.10 (one-sided)
+  type: statistical_assumption
+  parameters:
+    alpha: 0.10
+  source:
+    file: 2_PROTOCOL_APPENDIX.txt
+  depends_on: [D015]
+
+A007:
+  statement: |
+    Minimum onset support for Stage B: n_onset(g) ≥ 20 for full_eval.
+    Below this, PASS/FAIL not asserted.
+  type: statistical_requirement
+  parameters:
+    min_onset: 20
+  source:
+    file: 2_PROTOCOL_APPENDIX.txt
+  depends_on: [D011]
+
+A008:
+  statement: |
+    Adequacy condition: min_g inadeq(g) ≤ 0.10
+    At least one g must have inadequacy rate ≤ 10%.
+  type: adequacy_requirement
+  parameters:
+    max_inadeq: 0.10
+  source:
+    file: 2_PROTOCOL_APPENDIX.txt
+  depends_on: [D012]
+
+A009:
+  statement: |
+    Protocol does NOT assert subjective experience.
+    Only observable dynamic signatures are evaluated.
+  type: epistemological_boundary
+  source:
+    file: 1_MANUSCRIPT.txt
+    section: "1. Motivation and Scope"
+  depends_on: []
+  note: Explicit scope limitation
+
+A010:
+  statement: |
+    Environment and agent are synthetic.
+    External validity to deployed systems must be tested separately.
+  type: external_validity_limitation
+  source:
+    file: 1_MANUSCRIPT.txt
+    section: "6. Limitations"
+  depends_on: []
+
+A011:
+  statement: |
+    g is fixed during single run.
+    Per-seed post-hoc adjustment is prohibited.
+  type: protocol_constraint
+  source:
+    file: 9_Supplement_S-AI.txt
+    section: "S2.1 Requirements"
+  depends_on: [D001]
+
+A012:
+  statement: |
+    Learning (Q update) is PROHIBITED during evaluation.
+    Violation triggers terminal falsification.
+  type: protocol_constraint
+  source:
+    file: 8_CM_Operational_Definition.txt
+    section: "6. Falsification Conditions"
+  depends_on: [D040]
+
+A013:
+  statement: |
+    Memory (state retention) is REQUIRED for CM emergence.
+    Specifically h_t and m_t are necessary.
+  type: structural_requirement
+  source:
+    file: 12_Memory_Learning_Separation.txt
+  depends_on: [D041]
+
+# =============================================================================
+# Lesion Design Principles
+# =============================================================================
+
+A026:
+  statement: |
+    Lesion should be module-level blocking (not noise injection or total stop).
+    Purpose: "only targeted metric drops, others remain".
+    L1/L2/L3 should select mutually independent blocking points.
+  type: intervention_design_principle
+  source:
+    file: 9_Supplement_S-AI.txt
+    section: "S14. Design Principles"
+  depends_on: [D017]
+
+# =============================================================================
+# Convergence Dynamics Theory Assumptions (from 7_Convergence_Dynamics.txt)
+# =============================================================================
+
+A014:
+  statement: |
+    A1 (Mixing/Ergodicity): Sufficient mixing for ratio-strong laws
+    and block/HAC variance estimation.
+  type: mathematical_assumption
+  source:
+    file: 7_Convergence_Dynamics.txt
+    section: "A. Assumption System"
+  depends_on: []
+
+A015:
+  statement: |
+    A2 (Uniform Ellipticity): Eigenvalues of diffusion tensor D
+    have uniform upper and lower bounds.
+  type: mathematical_assumption
+  source:
+    file: 7_Convergence_Dynamics.txt
+  depends_on: []
+
+A016:
+  statement: |
+    A3 (Boundary Regularity): Boundary terms vanish in integrals
+    under no-flux boundary conditions.
+  type: mathematical_assumption
+  source:
+    file: 7_Convergence_Dynamics.txt
+  depends_on: []
+
+A017:
+  statement: |
+    A4 (Function Classes): Existence of f ∈ H^1 ∩ L^∞
+    and bounded frame {f_i}_{i=1}^m.
+  type: mathematical_assumption
+  source:
+    file: 7_Convergence_Dynamics.txt
+  depends_on: []
+
+A018:
+  statement: |
+    A5' (SN-MGF/Tail Control): One-sided lower bounds of
+    self-normalization safely apply to heavy tails.
+  type: mathematical_assumption
+  source:
+    file: 7_Convergence_Dynamics.txt
+  depends_on: []
+
+A019:
+  statement: |
+    A6 (split/CF): Complete separation of exploration (learning/selection)
+    and evaluation (LCB computation).
+  type: protocol_assumption
+  source:
+    file: 7_Convergence_Dynamics.txt
+  depends_on: []
+  note: Core of non-circularity
+
+A020:
+  statement: |
+    A7 (Endogenous Stopping Correction): Scheme D uses IPW,
+    Scheme E uses regeneration target.
+  type: protocol_assumption
+  source:
+    file: 7_Convergence_Dynamics.txt
+  depends_on: []
+
+A021:
+  statement: |
+    A8/A8'/A9' (Model constant supply): Poincaré gap, 1-form gap, sector condition
+    for H/S/C routes and gap/LRV control for Scheme D.
+  type: mathematical_assumption
+  source:
+    file: 7_Convergence_Dynamics.txt
+  depends_on: []
+
+A022:
+  statement: |
+    Irreversibility condition: stationary flow v* ≠ 0.
+    Required for observed EPR lower bound.
+  type: mathematical_assumption
+  source:
+    file: 7_Convergence_Dynamics.txt
+    section: "Abstract"
+  depends_on: []
+
+A023:
+  statement: |
+    Non-circularity: RHS factors (c_data^eff, A_m, c_model*, v_eval)
+    determined independently without depending on S_obs^(P) estimation.
+    Exploration separated from evaluation.
+  type: methodological_principle
+  source:
+    file: 7_Convergence_Dynamics.txt
+    section: "Non-circularity Declaration"
+  depends_on: []
+
+A024:
+  statement: |
+    Primary/Secondary firewall: diagnostics (PC-χ, h_2)
+    do NOT affect decisions. Maintains falsifiability.
+  type: methodological_principle
+  source:
+    file: 7_Convergence_Dynamics.txt
+    section: "10. Secondary"
+  depends_on: []
+
+A025:
+  statement: |
+    BIP (Device Intervention Separation): Device contribution r_erase ln2
+    is treated as separable, verifiable nuisance.
+  type: protocol_assumption
+  source:
+    file: 7_Convergence_Dynamics.txt
+    section: "Appendix B"
+  depends_on: []
