@@ -215,10 +215,4 @@ If you publish this repository, consider adding a `CITATION.cff` (GitHub-native 
 
 ## License
 
-[Specify license here]
-
----
-
-## Acknowledgments
-
-[Acknowledgments here]
+This project is licensed under the [Apache License 2.0](LICENSE).
