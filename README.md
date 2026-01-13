@@ -1,6 +1,7 @@
 # CAP+OCI v6: Consciousness Modality Evaluation Protocol
 
-**Version**: v0.3.6p15.2ABv6
+**Protocol version**: v6.0
+**Implementation tag**: v0.3.6
 **Date**: 2026-01-13
 
 ---
@@ -100,12 +101,10 @@ CAP_OCI_v6/
 ### Prerequisites
 
 ```bash
-python -m pip install numpy scipy
+python -m pip install -r requirements.txt
 ```
 
 ### Running the Protocol
-
-> **Note**: The snippet below assumes `src/` is importable as a Python package. If you are running from the repo root without packaging, you can alternatively add `src/` to `PYTHONPATH` (or `sys.path`) and import `cap_oci_v036` directly.
 
 ```python
 from src.cap_oci_v036 import run_full_evaluation
