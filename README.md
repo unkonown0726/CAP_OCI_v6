@@ -35,6 +35,10 @@ The protocol provides **operational indicators**, not ontological proof.
 ```
 CAP_OCI_v6/
 ├── README.md                 # This file
+├── LICENSE                   # Apache 2.0 license
+├── CITATION.cff              # Citation metadata
+├── requirements.txt          # Core dependencies (numpy, scipy)
+├── requirements-dev.txt      # Optional dependencies (PDF generation)
 ├── .gitignore
 │
 ├── docs/                     # Core documentation
@@ -56,6 +60,7 @@ CAP_OCI_v6/
 │   └── 12_Memory_Learning_Separation.pdf
 │
 ├── src/                      # Implementation
+│   ├── __init__.py               # Package marker
 │   └── cap_oci_v036.py           # Core protocol implementation
 │
 ├── tools/                    # Utility scripts
@@ -125,10 +130,11 @@ See `docs/2_PROTOCOL_APPENDIX.pdf` for detailed protocol specification.
 If you have already produced/validated artifacts under `results/`, you can use the included tool script to regenerate the bundled report PDF:
 
 ```bash
+python -m pip install -r requirements-dev.txt
 python tools/generate_v6_report_pdf.py
 ```
 
-> If the script requires arguments in your setup, check its header/docstring.
+> Requires `reportlab` (listed in `requirements-dev.txt`).
 
 ---
 
