@@ -200,14 +200,14 @@ See `results/CAP_OCI_v6_Results.pdf` for detailed results.
 
 ## Citation
 
-If you publish this repository, consider adding a `CITATION.cff` (GitHub-native citation metadata) alongside the BibTeX entry below.
+Click "Cite this repository" on GitHub or use the BibTeX below:
 
 ```bibtex
 @misc{cap_oci_v6_2026,
   title={CAP+OCI v6: Consciousness Modality Evaluation Protocol},
-  author={...},
+  author={unkonown0726},
   year={2026},
-  note={Version v0.3.6p15.2ABv6}
+  note={Version v0.3.6}
 }
 ```
 
