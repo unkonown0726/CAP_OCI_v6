@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "CAP+OCI v6: Consciousness Modality Evaluation Protocol"
+version: v0.3.6
+date-released: 2026-01-13
+license: Apache-2.0
+repository-code: "https://github.com/unkonown0726/CAP_OCI_v6"
+authors:
+  - name: unkonown0726
+    alias: unkonown0726
+keywords:
+  - consciousness
+  - evaluation protocol
+  - operational indicators
+  - consciousness modality
+  - CM indicators
+abstract: >-
+  CAP+OCI v6 is an operational protocol for evaluating Consciousness Modality (CM)
+  indicators in computational systems. The protocol provides falsifiable, reproducible
+  evaluation methods including g-dependent onset regime transition detection,
+  conditional robustness validation, and mechanistic specificity testing.
+  "Consciousness Modality" is used as an operational label for the measured indicator
+  pattern, not as a claim about subjective experience.
